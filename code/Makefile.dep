@@ -1,0 +1,5 @@
+# Makefile.dep created 
+protocol.o: protocol.cpp protocol.h sockets.h
+sockets.o: sockets.cpp sockets.h
+cxi.o: cxi.cpp protocol.h sockets.h logstream.h
+cxid.o: cxid.cpp protocol.h sockets.h logstream.h

@@ -1,0 +1,141 @@
+$Id: SCORE,v 1.13 2020-12-08 12:17:52-08 - - $
+
+Copy all of the files in this directory into the student's
+directory.  For each point deduction, give a reason.  Numbers in
+parens are the max points for each check.
+
+Check to see if they are working alone or doing pair
+programming.  If pair programming, they should have a symlink to
+their partner's directory.  If it is not there, you should make
+one.  Grade only one partner's code and assign them the same score.
+
+*****************************************************************
+
+SOURCE CODE.
+
+     Grader: examine code only in cxi.cpp and cxid.cpp.
+     If students submitted both cxi and cix files, ignore
+     the older files.  Use the files named in Makefile.
+
+     Run mk.build
+
+     (3) Checksource was silent, did not complain.  No extra
+         files were submitted, except as per asgt spec.
+         C++ source are all called .h or .cpp as appropriate.
+         (.cc suffix also ok instead of .cpp)
+
+     (3) Indentation, formatting, and identifier names readable.
+         Did not leave any commented-out code interspersed
+         with running code.
+
+     (3) client get - code to parse command, make packet to
+         send to server, and receive data reply.  Code to
+         save file in current directory.
+
+     (3) server get - responds to get request, ifstream to
+         open file and load into buffer.  Send back in  a
+         FILE packet
+
+     (3) client put - code to open file, load into buffer,
+         make PUT packet and send it, follow by payload
+         containing file bytes.  Accept ACK or NAK
+
+     (3) server put - code to accept PUT followed by payload
+         open file and save.  Send back ACK or NAK
+
+     (3) client rm - parse command and send header, receive
+         reply.
+
+     (3) server rm - accept packet call unlink(2), send back
+         reply.
+
+     (3) server ACK NAK check on any syscalls and send an ACK
+         for success and a NAK with errno for fail.
+         client:  print an OK message for an ACK and a 
+         syserror message for a NAK.
+
+     (3) Do not deduct this point.
+
+source points: /30
+min 1, max 30
+
+*****************************************************************
+
+PROGRAM TESTING:
+
+     Run mk.build - if an executable was not built, assign 0
+     points to this section.
+
+     Note to grader:  You must be logged into unix.ucsc.edu
+     using separate xterms.  Use 'hostname' to verify
+     that you have logged into the SAME machine.
+
+     In one xterm, edit the SCORE file so you can record things
+     that happen.
+
+     Instructions for copying in .score are a little different:
+     cp -R .score/* .
+     that way the two subdirectories local and remote are
+     copied into the student's directory.
+     For each test, keep a typescript of the testing.
+
+     daemon:
+     in the daemon, cd remote:
+     which cxid
+     script daemon.log1
+     ../cxid 8888 (or whatever port works for you)
+
+     in the client xterm: cd local
+     script client.log
+     ../cxi localhost 8888
+
+     That starts things, then move back and forth between each
+     of the clients watching the daemon chatter.
+     For the following, type in a command to see if it works.
+     the prefix tells you which client to test.
+
+     (4) client: ls
+         do you get the output?
+
+     (4) client: put localfile
+         client: put localtto
+         did the server respond?
+
+     (4) client: ls
+         are the new files there?
+
+     (4) client: get server1file
+         is the file now in client's directory?
+
+     (4) client: rm to-remove
+         does client now have client's local file
+         were the server files unlinked?
+
+     (4) client: rm no-such-file
+         Suitable error message?  no change to server directory?
+  
+     (4) type "exit" to client, then 
+         ls -la to the bash shell
+         exit will stop recording the typescript.
+         after grading make sure you exit the typescript.
+         Were the script log files there and did the
+         file transfers take effect as usual.
+
+     (2) These are two free points if neither client nor
+         server crashed.
+
+testing points: /30
+min 0, max 30.
+
+*****************************************************************
+
+SUBTOTAL=
+min 1, max 60
+
+If pair programming, TOTALSCORE = SUBTOTAL - TOTALPAIR.
+If not, TOTALSCORE = SUBTOTAL.
+
+TOTALSCORE=
+min 1, max 60
+
+

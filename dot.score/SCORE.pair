@@ -1,0 +1,35 @@
+
+Grader: If the student is working alone, ignore this file and
+do not deduct any points described here.  If the students are
+working in a pair, grade *ONLY* one of the pair's work.
+
+Make a *relative* symlink in the non-graded partner's directory
+called SCORE pointing at the SCORE file in this directory.  Do
+not copy the SCORE file.  Create the symlink via:
+.   ln -s ../(partner)/SCORE
+where (partner) is the partner's actual username.  After that,
+ls -la should show something like
+.   lrwxr-xr-x   17 Jun 10 18:04 SCORE -> ../(partner)/SCORE
+
+(2) Did both partners' names and usernames appear in a comment
+    at or near the top of all text files submitted (except
+    see below for PARTNER file)?
+
+(3) Did they both submit a README which contained the required
+    contents?  Deduct the full 2 points if either partner
+    did not.
+
+(5) Was the PARTNER file correctly formatted?  Both partners
+    must have a PARTNER file pointing at the other.  Refer to
+    the scorecheck report.
+
+These files must be spelled README and PARTNER, respectively,
+in exactly that way, in upper case.  Add up the negative points
+above and enter that on the TOTALPAIR line.
+
+TOTALPAIR=
+.between -10 and 0, inclusive.
+
+In the SCORE file, reduce TOTALSCORE by TOTALPAIR.
+
+$Id: SCORE.pair,v 1.6 2020-11-06 22:27:59-08 - - $

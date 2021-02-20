@@ -3,6 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <fstream>
 using namespace std;
 
 #include <libgen.h>
@@ -47,7 +49,57 @@ void reply_ls (accepted_socket& client_sock, cxi_header& header) {
    outlog << "sent " << ls_output.size() << " bytes" << endl;
 }
 
-
+void reply_get(accepted_socket& client_sock, cxi_header& header){
+   ifstream ifs(header.filename, std::ifstream::in);
+
+   std::string content((std::istreambuf_iterator<char>(ifs)),
+                       (std::istreambuf_iterator<char>()));
+   ifs.close();
+
+   header.command = cxi_command::FILEOUT;
+   header.nbytes = htonl (content.size());
+   memset (header.filename, 0, FILENAME_SIZE);
+   outlog << "sending header " << header << endl;
+   send_packet (client_sock, &header, sizeof header);
+   send_packet (client_sock, content.c_str(), content.size());
+   outlog << "sent " << content.size() << " bytes" << endl;
+}
+
+void reply_put(accepted_socket& client_sock, cxi_header& header){
+   size_t host_nbytes = ntohl(header.nbytes);
+   auto buffer = make_unique<char[]>(host_nbytes + 1);
+   recv_packet(client_sock, buffer.get(), host_nbytes);
+   outlog << "received " << host_nbytes << " bytes" << endl;
+   buffer[host_nbytes] = '\0';
+
+   cout << buffer.get() << endl;
+
+   ofstream ofs(header.filename, std::ofstream::out);
+   ofs << buffer.get();
+   ofs.close();
+
+   header.command = cxi_command::ACK;
+   outlog << "sending header " << header << endl;
+   send_packet (client_sock, &header, sizeof header);
+}
+
+void reply_rm(accepted_socket& client_sock, cxi_header& header){
+
+   int status = unlink(header.filename);
+
+   if (status < 0){
+      outlog << "unlink" << ": " << strerror (errno) << endl;
+      header.command = cxi_command::NAK;
+      header.nbytes = htonl(errno);
+      send_packet(client_sock, &header, sizeof header);
+      return;
+   }
+
+   header.command = cxi_command::ACK;
+   outlog << "sending header " << header << endl;
+   send_packet (client_sock, &header, sizeof header);
+}
+
 void run_server (accepted_socket& client_sock) {
    outlog.execname (outlog.execname() + "*");
    outlog << "connected to " << to_string (client_sock) << endl;
@@ -59,6 +111,15 @@ void run_server (accepted_socket& client_sock) {
          switch (header.command) {
             case cxi_command::LS: 
                reply_ls (client_sock, header);
+               break;
+            case cxi_command::GET:
+               reply_get(client_sock, header);
+               break;
+            case cxi_command::PUT:
+               reply_put(client_sock, header);
+               break;
+            case cxi_command::RM:
+               reply_rm(client_sock, header);
                break;
             default:
                outlog << "invalid client header:" << header << endl;
@@ -90,7 +151,6 @@ void fork_cxiserver (server_socket& server, accepted_socket& accept) {
    }
 }
 
-
 void reap_zombies() {
    for (;;) {
       int status;
@@ -118,7 +178,6 @@ void signal_action (int signal, void (*handler) (int)) {
                       << " failed: " << strerror (errno) << endl;
 }
 
-
 int main (int argc, char** argv) {
    outlog.execname (basename (argv[0]));
    outlog << "starting" << endl;
